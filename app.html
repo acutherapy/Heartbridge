@@ -1,165 +1,473 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0f1220">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+  }
+</script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HeartBridge · App</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0f1220">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HeartBridge · Cross‑Gen Social & Talk Assistant</title>
   <style>
     :root{
-      --bg:#0f1220; --card:#171a2f; --ink:#e8ebff; --muted:#9aa3c7;
-      --brand:#7c5cff; --brand2:#2ee6a6; --line:rgba(255,255,255,.1);
+      --bg:#0f1220;
+      --card:#171a2f;
+      --ink:#e8ebff;
+      --muted:#9aa3c7;
+      --brand:#7c5cff;
+      --brand-2:#2ee6a6;
+      --danger:#ff5c8a;
+      --ok:#2ee6a6;
+      --warn:#ffd166;
     }
-    *{box-sizing:border-box} html,body{height:100%}
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; color:var(--ink);
-      font-family: ui-sans-serif,system-ui,-apple-system,Inter,Segoe UI,Roboto,Helvetica,Arial;
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
+      color:var(--ink);
       background:
         radial-gradient(900px 600px at 5% -10%, rgba(124,92,255,.25), transparent 60%),
         radial-gradient(900px 600px at 95% 110%, rgba(46,230,166,.15), transparent 60%),
         var(--bg);
     }
-    .nav{position:sticky;top:0;z-index:9;display:flex;justify-content:space-between;align-items:center;
-      padding:14px 18px;background:rgba(10,12,25,.6);backdrop-filter: blur(8px);border-bottom:1px solid var(--line)}
-    .logo{display:flex;gap:10px;align-items:center;font-weight:700}
-    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(45deg,var(--brand),var(--brand2))}
-    .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
-      padding:8px 12px;border-radius:10px;cursor:pointer}
-    .btn.p{background:var(--brand);border-color:transparent;color:#fff;font-weight:700}
-    .wrap{max-width:1120px;margin:0 auto;padding:16px}
-    .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-    h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:8px 0 10px}
-    .sub{color:var(--muted)}
-    .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:#cfd6ff}
-    .chat{display:grid;grid-template-rows:auto 1fr auto;min-height:420px}
-    .msgs{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:8px}
-    .bubble{max-width:78%;padding:10px 12px;border-radius:12px;line-height:1.35}
-    .ai{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid var(--line)}
-    .me{align-self:flex-end;background:rgba(124,92,255,.25);border:1px solid rgba(124,92,255,.4)}
-    .composer{display:flex;gap:8px}
-    .field{flex:1;display:flex;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px}
-    .field input{flex:1;border:0;outline:none;background:transparent;color:var(--ink);padding:10px}
-    .meter{height:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;overflow:hidden}
-    .meter i{display:block;height:100%;width:16%;background:linear-gradient(90deg,#2ee6a6,#ffd166,#ff5c8a)}
+    a{color:var(--brand)}
+    .nav{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 20px;background:rgba(10,12,25,.7);backdrop-filter: blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.06)
+    }
+    .logo{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.3px}
+    .logo .dot{width:10px;height:10px;border-radius:99px;background:linear-gradient(45deg,var(--brand),var(--brand-2))}
+    .btn{border:0;border-radius:10px;padding:10px 14px;background:var(--brand);color:white;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--ink)}
+    .btn.small{padding:8px 10px;font-size:.9rem}
+    .grid{display:grid;gap:16px}
+    .hero{
+      display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;
+      padding:40px 20px;max-width:1100px;margin:0 auto;
+    }
+    .h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:0 0 10px}
+    .sub{color:var(--muted);max-width:60ch}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px}
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.14);padding:8px 10px;border-radius:999px;font-size:.9rem;color:#cdd4ff}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .section{max-width:1100px;margin:0 auto;padding:14px 20px 28px}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .kpi{padding:14px;border-radius:12px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12)}
+    .kpi .big{font-size:24px;font-weight:800}
+    .pill{border-radius:999px;padding:4px 8px;font-size:.8rem;color:#c7cff1;background:rgba(255,255,255,.06);display:inline-block}
     .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .match{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-    .pf{background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),var(--card);
-      border:1px solid var(--line);border-radius:14px;overflow:hidden}
-    .pf-top{height:140px;background:radial-gradient(600px 200px at 50% -20%, rgba(124,92,255,.35), transparent 60%),linear-gradient(120deg,#31365e,#20233d)}
+    .list{display:grid;gap:10px}
+    .item{display:flex;gap:10px;align-items:flex-start}
+    .dot{width:10px;height:10px;border-radius:99px;background:var(--brand-2);margin-top:8px}
+    .muted{color:var(--muted)}
+    .footer{padding:30px 20px;color:#b8c0e6;text-align:center;border-top:1px solid rgba(255,255,255,.06)}
+    /* MATCH AREA */
+    .match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+    .profile{background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden}
+    .pf-img{height:160px;background:radial-gradient(600px 200px at 50% -20%, rgba(124,92,255,.35), transparent 60%),linear-gradient(120deg,#31365e,#20233d)}
     .pf-body{padding:12px}
-    .tag{font-size:.75rem;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:#ced5ff;display:inline-block;margin-right:6px;margin-bottom:6px}
-    @media (max-width: 900px){ .grid{grid-template-columns:1fr} .cols{grid-template-columns:1fr} }
+    .tags{display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:.75rem;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.16);color:#ced5ff}
+    /* CHAT */
+    .chat{display:grid;grid-template-rows:auto 1fr auto;min-height:420px}
+    .messages{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:8px}
+    .bubble{max-width:80%;padding:10px 12px;border-radius:12px;line-height:1.35}
+    .me{align-self:flex-end;background:rgba(124,92,255,.25);border:1px solid rgba(124,92,255,.35)}
+    .ai{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+    .composer{display:flex;gap:8px}
+    .field{flex:1;display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:6px}
+    .field input{flex:1;background:transparent;border:0;outline:none;color:var(--ink);padding:8px}
+    .select{display:flex;gap:8px;flex-wrap:wrap}
+    .select select,.select input[type="range"]{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--ink);border-radius:8px;padding:8px}
+    .meter{height:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+    .meter > i{display:block;height:100%;width:22%;background:linear-gradient(90deg,var(--ok),var(--warn),var(--danger))}
+    .legal{font-size:.85rem;color:#aab3da}
+    .notice{border-left:3px solid var(--brand-2);padding:10px 12px;background:rgba(46,230,166,.08);border-radius:8px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
+    .modal{width:min(560px,92%);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px}
+    .modal h3{margin:6px 0 12px}
+    .row-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .check{display:flex;gap:8px;align-items:flex-start}
+    .check input{margin-top:3px}
+    .hidden{display:none}
+    @media (max-width: 900px){
+      .hero{grid-template-columns:1fr}
+      .cols{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
-  <div class="nav">
+  <nav class="nav">
     <div class="logo"><span class="dot"></span> HeartBridge</div>
     <div class="row">
-      <button class="btn" onclick="location.href='/'">Account</button>
+      <button class="btn ghost small" id="openOnboard">Create account</button>
+      <button class="btn small" id="openLogin">Sign in</button>
     </div>
-  </div>
+  </nav>
 
-  <div class="wrap grid">
+  <header class="hero">
     <div class="card">
-      <span class="chip">AI Talk Assistant</span>
-      <h1>Talk natural, connect real.</h1>
-      <p class="sub">Pick your tone & vibe, type a message, and I’ll suggest a respectful next line. Everyone is 18+. Consent first, always.</p>
-      <div class="card chat" style="margin-top:12px">
-        <div class="msgs" id="msgs"></div>
-        <div class="composer">
-          <div class="field"><input id="input" placeholder="Type your message... (enter to send)"></div>
-          <button class="btn p" id="send">Send</button>
+      <div class="chip">Cross‑Gen social · AI talk coach</div>
+      <h1 class="h1">Talk natural, connect real.<br/> Built‑in AI makes cross‑generation chats ✨effortless.</h1>
+      <p class="sub">HeartBridge helps adults 18+ build respectful connections across age groups. Smart prompts, consent‑first matching, and a safety layer keep the vibe healthy and legit.</p>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="startNow">Start free</button>
+        <button class="btn ghost" id="scrollDemo">See demo ↓</button>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <span class="pill">Real‑time tone coach</span>
+        <span class="pill">Consent & safety filter</span>
+        <span class="pill">Icebreakers built‑in</span>
+      </div>
+    </div>
+    <div class="card chat" id="demoChatCard" aria-live="polite">
+      <div class="row" style="gap:8px;align-items:center">
+        <span class="pill">AI Talk Assistant</span>
+        <div class="select">
+          <label class="pill">Style</label>
+          <select id="tone">
+            <option value="warm">Warm</option>
+            <option value="funny">Playful</option>
+            <option value="smart">Smart</option>
+            <option value="flirty">Light‑flirty (safe)</option>
+          </select>
+          <label class="pill">Vibe</label>
+          <select id="vibe">
+            <option value="coffee">Coffee chat</option>
+            <option value="hobby">Hobby talk</option>
+            <option value="travel">Travel</option>
+            <option value="music">Music</option>
+          </select>
+          <label class="pill">Boundaries</label>
+          <select id="boundary">
+            <option value="polite">Polite</option>
+            <option value="casual">Casual</option>
+            <option value="bold">A bit bold</option>
+          </select>
         </div>
-        <div style="margin-top:8px">
-          <div class="meter"><i id="meter"></i></div>
-          <div class="sub" style="font-size:.85rem;margin-top:6px">Safety meter auto‑flags pushy / age‑inappropriate lines.</div>
+      </div>
+      <div class="messages" id="msgs"></div>
+      <div class="composer">
+        <div class="field"><input id="input" placeholder="Type your message... (enter to send)"/></div>
+        <button class="btn" id="send">Send</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div style="flex:1">
+          <div class="meter" title="Safety meter">
+            <i id="meterBar" style="width:18%"></i>
+          </div>
+          <div class="muted" style="font-size:.85rem;margin-top:6px">Safety meter auto‑flags pushy / age‑inappropriate lines.</div>
         </div>
       </div>
     </div>
+  </header>
 
-    <div class="cols">
-      <div class="card">
-        <h3>Smart Match (Interests first)</h3>
-        <p class="sub">Pick a vibe, not an age. Everyone is 18+. We match by interests & lifestyle.</p>
-        <div class="match" id="match"></div>
+  <section class="section">
+    <div class="kpis">
+      <div class="kpi"><div class="big" id="k1">0</div><div class="muted">Respect‑checked prompts</div></div>
+      <div class="kpi"><div class="big" id="k2">0</div><div class="muted">Conversation starters</div></div>
+      <div class="kpi"><div class="big" id="k3">0</div><div class="muted">Community interests</div></div>
+    </div>
+  </section>
+
+  <section class="section cols">
+    <div class="card">
+      <h3>Smart Match (Interests first)</h3>
+      <p class="muted">Pick a vibe, not an age. Everyone is 18+. We match by interests & lifestyle, then you decide.</p>
+      <div class="match-grid" id="matchGrid"></div>
+    </div>
+    <div class="card">
+      <h3>Starter Packs</h3>
+      <div class="list" id="packs"></div>
+      <div class="notice" style="margin-top:12px">
+        <strong>Consent‑first:</strong> If either person toggles <em>Not into age‑gap</em>, we won’t surface the match. Block/report tools are one tap.
       </div>
-      <div class="card">
-        <h3>Starter Packs</h3>
-        <div id="packs"></div>
-        <div class="sub" style="margin-top:10px">
-          <strong>Consent‑first:</strong> If either person toggles <em>Not into age‑gap</em>, we won’t surface the match.
+      <div class="legal" style="margin-top:10px">
+        🚨 By using HeartBridge you confirm you are 18+ and agree to community rules. No harassment, grooming, or illegal activity.
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">© 2025 HeartBridge — Cross‑generation respect, real connections.</footer>
+
+  <!-- Onboarding modal -->
+  <div class="modal-backdrop" id="onboard">
+    <div class="modal">
+      <h3>Create your account</h3>
+      <div class="row-split">
+        <div class="card">
+          <label>Display name</label>
+          <input id="name" class="field" placeholder="e.g. Alex" />
+          <label style="margin-top:8px">Age</label>
+          <input id="age" class="field" placeholder="18+" />
+          <label style="margin-top:8px">Top interests</label>
+          <div class="select">
+            <select id="interestA">
+              <option>Travel</option><option>Coffee</option><option>Yoga</option><option>Cooking</option><option>Photography</option>
+            </select>
+            <select id="interestB">
+              <option>Books</option><option>Hiking</option><option>Music</option><option>Films</option><option>Art</option>
+            </select>
+          </div>
         </div>
+        <div class="card">
+          <h4>Community rules</h4>
+          <div class="check">
+            <input type="checkbox" id="c1">
+            <label for="c1">I confirm I am 18+ and will not harass, pressure, or lie about my age or intent.</label>
+          </div>
+          <div class="check">
+            <input type="checkbox" id="c2">
+            <label for="c2">I respect consent, boundaries, and will keep conversations legal and kind.</label>
+          </div>
+          <div class="check">
+            <input type="checkbox" id="c3">
+            <label for="c3">I understand unsafe messages may be flagged or my account paused.</label>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;justify-content:flex-end">
+        <button class="btn ghost" id="closeOnboard">Cancel</button>
+        <button class="btn" id="saveOnboard">Create</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // PWA SW
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
-    }
+  <!-- Login modal (mock) -->
+  <div class="modal-backdrop" id="login">
+    <div class="modal">
+      <h3>Sign in</h3>
+      <div class="row-split">
+        <div class="card">
+          <label>Email</label>
+          <input class="field" placeholder="you@example.com" id="loginEmail"/>
+          <label style="margin-top:8px">Password</label>
+          <input class="field" type="password" placeholder="••••••••" id="loginPw"/>
+        </div>
+        <div class="card">
+          <p class="muted">This demo keeps it simple—no backend. Use any values to try it out.</p>
+          <p class="muted">Pro tip: export your profile JSON for dev handoff.</p>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;justify-content:flex-end">
+        <button class="btn ghost" id="closeLogin">Close</button>
+        <button class="btn" id="doLogin">Sign in</button>
+      </div>
+    </div>
+  </div>
 
-    const msgs = document.getElementById('msgs');
-    const push = (t,who='ai') => {
-      const b = document.createElement('div');
-      b.className = 'bubble ' + (who==='me'?'me':'ai');
-      b.textContent = t;
-      msgs.appendChild(b);
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-    const bad = /(youngster|underage|secret|hotel now|send pics|nsfw|nude|explicit)/ig;
-    const score = (s)=>{
-      let x=0; if(bad.test(s)) x+=60;
-      if(/drink(s)? tonight/i.test(s)) x+=15;
-      if(/come over/i.test(s)) x+=20;
-      if(/age/i.test(s) && /okay/i.test(s)) x+=10;
-      return Math.min(95,x);
-    };
-    const bar = (n)=> document.getElementById('meter').style.width = Math.max(10, 8+n*0.9)+'%';
-    const reply = (m)=>{
-      const replies = [
-        "Got it. What vibe are you hoping for—coffee chat, hobby deep‑dive, or travel stories?",
-        "That makes sense. Curious, what’s a small joy that made your week better?",
-        "Love the energy. Want a gentle icebreaker or something a bit bold?"
-      ];
-      return replies[Math.floor(Math.random()*replies.length)];
-    }
-    push("Hey! I’m HeartBridge’s AI coach. Type something—I'll offer a kind, safe next line.");
-    document.getElementById('send').onclick = ()=>{
-      const v = document.getElementById('input').value.trim(); if(!v) return;
-      push(v,'me'); document.getElementById('input').value='';
-      const s = score(v); bar(s);
-      if(s>50) push("Heads up—this could read as pushy or unsafe. Try softening or changing the topic.");
-      setTimeout(()=>push(reply(v)), 400);
-    };
+<script>
+// ---- Tiny state
+const $ = s=>document.querySelector(s);
+const $$ = s=>document.querySelectorAll(s);
+const state = {
+  user:null,
+  counters:{prompts:142, starters:580, interests:36},
+  packs:[
+    {title:"Coffee chat", tips:["What’s your go‑to brew?","Café you’d recommend?","Weekday vs weekend coffee rituals?"], vibe:"coffee"},
+    {title:"Travel warm‑up", tips:["What city surprised you most?","Window or aisle?","Dream short trip this month?"], vibe:"travel"},
+    {title:"Music mood", tips:["What song’s on repeat?","First concert story?","Vinyl, playlists, or radio?"], vibe:"music"},
+    {title:"Hobby flex", tips:["What are you learning lately?","Show me your setup?","Beginner tips you wish you knew?"], vibe:"hobby"},
+  ],
+  profiles:[
+    {name:"Mina", age:24, interests:["Photography","Books","Hiking"], note:"Loves sunrise hikes + indie film nights."},
+    {name:"Ken", age:29, interests:["Coffee","Music","Travel"], note:"Third‑wave coffee nerd, open‑mic guitar."},
+    {name:"Lily", age:22, interests:["Art","Yoga","Cooking"], note:"Ceramics, farmers market weekends."},
+    {name:"Jay",  age:26, interests:["Films","Travel","Hiking"], note:"A24 stan, cheap flights hunter."},
+    {name:"Ivy",  age:31, interests:["Books","Music","Coffee"], note:"Book club host; lo‑fi at work."},
+    {name:"Noah", age:23, interests:["Photography","Art","Travel"], note:"Street shots, city wanderer."},
+  ]
+};
 
-    const people=[
-      {n:"Mina",a:24,t:["Photography","Books","Hiking"],d:"Sunrise hikes + indie film nights."},
-      {n:"Ken",a:29,t:["Coffee","Music","Travel"],d:"Third‑wave coffee nerd, open‑mic guitar."},
-      {n:"Ivy",a:31,t:["Books","Music","Coffee"],d:"Book club host; lo‑fi at work."},
-      {n:"Jay",a:26,t:["Films","Travel","Hiking"],d:"A24 stan, cheap flights hunter."}
-    ];
-    const match = document.getElementById('match');
-    people.forEach(p=>{
-      const el = document.createElement('div'); el.className='pf';
-      el.innerHTML = '<div class="pf-top"></div><div class="pf-body"><div style="display:flex;justify-content:space-between;align-items:center"><strong>'+p.n+' · '+p.a+'</strong><button class="btn">Wave 👋</button></div><div class="sub" style="margin:6px 0">'+p.d+'</div>'+p.t.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div>';
-      match.appendChild(el);
-    });
+// init counters
+['k1','k2','k3'].forEach((id,i)=>{
+  const keys=['prompts','starters','interests'];
+  const val = state.counters[keys[i]];
+  let n=0;
+  const t=setInterval(()=>{
+    n += Math.ceil(val/18);
+    if(n>=val){n=val;clearInterval(t)}
+    $('#'+id).innerText = n.toLocaleString();
+  },25);
+});
 
-    const packs = [
-      {t:"Coffee chat", tips:["What’s your coffee ritual?","Café you’d recommend?","Weekday vs weekend coffee?" ]},
-      {t:"Travel warm‑up", tips:["What city surprised you most?","Window or aisle?","Dream short trip this month?"]},
-    ];
-    const packsEl = document.getElementById('packs');
-    packs.forEach(p=>{
-      const box = document.createElement('div'); box.style.margin='8px 0';
-      box.innerHTML = '<div><strong>'+p.t+'</strong></div><div class="sub">'+p.tips.join(" · ")+'</div><button class="btn" style="margin-top:6px">Use tips →</button>';
-      packsEl.appendChild(box);
-    });
-  </script>
+// render match cards
+function renderMatches(){
+  const el = $('#matchGrid'); el.innerHTML='';
+  state.profiles.forEach(p=>{
+    const box = document.createElement('div');
+    box.className='profile';
+    box.innerHTML = `
+      <div class="pf-img"></div>
+      <div class="pf-body">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <strong>${p.name} · ${p.age}</strong>
+          <button class="btn small ghost" data-name="${p.name}">Wave 👋</button>
+        </div>
+        <div class="muted" style="margin:6px 0">${p.note}</div>
+        <div class="tags">${p.interests.map(i=>`<span class="tag">${i}</span>`).join('')}</div>
+      </div>`;
+    el.appendChild(box);
+  });
+}
+renderMatches();
+
+// render packs
+function renderPacks(){
+  const el = $('#packs'); el.innerHTML='';
+  state.packs.forEach(p=>{
+    const item = document.createElement('div');
+    item.className='item';
+    item.innerHTML = `<div class="dot"></div>
+      <div>
+        <div><strong>${p.title}</strong> <span class="pill">${p.vibe}</span></div>
+        <div class="muted">${p.tips.join(' · ')}</div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn small" data-pack="${p.vibe}">Use tips →</button>
+        </div>
+      </div>`;
+    el.appendChild(item);
+  });
+}
+renderPacks();
+
+// Chat demo logic (mock "AI" with local rules)
+const msgs = $('#msgs');
+function pushBubble(text, who='ai'){
+  const b = document.createElement('div');
+  b.className='bubble '+(who==='me'?'me':'ai');
+  b.textContent = text;
+  msgs.appendChild(b);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function safetyScore(s){
+  // toy scoring: penalize words considered pushy or age‑pressuring
+  let score = 0;
+  const bad = /(youngster|underage|secret|hotel now|send pics|nsfw|nude|explicit)/ig;
+  if(bad.test(s)) score += 60;
+  if(/drink(s)? tonight/i.test(s)) score += 15;
+  if(/come over/i.test(s)) score += 20;
+  if(/age/i.test(s) && /okay/i.test(s)) score += 10;
+  return Math.min(95, score);
+}
+function meterSet(score){
+  const w = Math.max(8, 8 + score*0.9);
+  $('#meterBar').style.width = w + '%';
+}
+function aiReply(userMsg){
+  const tone = $('#tone').value;
+  const vibe = $('#vibe').value;
+  const boundary = $('#boundary').value;
+  const openers = {
+    coffee:[
+      "Love this—what’s your coffee ritual? I’m a slow‑pour nerd on weekends.",
+      "I map cities by cafés. Got a favorite cozy spot?"
+    ],
+    travel:[
+      "Spontaneous trips are elite. What place surprised you in a good way?",
+      "Window seat forever. What’s your power snack in airports?"
+    ],
+    music:[
+      "What song is on loop for you lately? I need new recs.",
+      "First concert story—go! Mine was chaotic but iconic."
+    ],
+    hobby:[
+      "What are you tinkering with these days? I love hearing passion projects.",
+      "Teach me one tiny thing about your hobby that most people miss."
+    ]
+  };
+  const style = {
+    warm:(t)=> "That makes sense. " + t,
+    funny:(t)=> t.replace(" ", " 😄 "),
+    smart:(t)=> "Curious—" + t,
+    flirty:(t)=> "Low‑key cute: " + t + " (only if you’re into it)"
+  };
+  let base = openers[vibe][Math.floor(Math.random()*openers[vibe].length)];
+  if(boundary==='polite') base = base.replace("cute: ","");
+  if(boundary==='bold') base += " Want to continue this over a short call sometime?";
+  const styled = style[tone==='flirty'?'flirty':tone](base);
+  return styled;
+}
+
+// seed messages
+pushBubble("Hey! I’m HeartBridge’s AI talk coach. Pick your tone & vibe, type something, and I’ll suggest a respectful next line.");
+pushBubble("Reminder: Everyone here is 18+. Consent and kindness are non‑negotiable.");
+
+$('#send').addEventListener('click', ()=>{
+  const v = $('#input').value.trim();
+  if(!v) return;
+  pushBubble(v,'me');
+  $('#input').value='';
+  // safety
+  const s = safetyScore(v);
+  meterSet(s);
+  if(s>50){
+    pushBubble("This message might be read as pushy or unsafe. Try softening it or changing the topic.");
+  }
+  setTimeout(()=>{
+    pushBubble(aiReply(v));
+  }, 400);
+});
+$('#input').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); $('#send').click(); }
+});
+
+// packs → composer
+$('#packs').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-pack]');
+  if(!b) return;
+  const vibe = b.getAttribute('data-pack');
+  $('#vibe').value = vibe;
+  pushBubble(`Loaded ${vibe} starter pack. Ask away!`);
+});
+
+// Onboarding & login (mock)
+const mod = (id,show)=>{ const el=$(id); el.style.display = show?'flex':'none'; }
+
+$('#openOnboard').onclick = ()=>mod('#onboard',true);
+$('#closeOnboard').onclick = ()=>mod('#onboard',false);
+$('#saveOnboard').onclick = ()=>{
+  const name = $('#name').value.trim() || 'Guest';
+  const age = parseInt($('#age').value,10)||0;
+  if(age<18){ alert('18+ only.'); return; }
+  const user = {
+    name, age,
+    interests: [$('#interestA').value, $('#interestB').value],
+    rules: [$('#c1').checked,$('#c2').checked,$('#c3').checked].every(Boolean)
+  };
+  if(!user.rules){ alert('Please accept community rules.'); return; }
+  localStorage.setItem('hb_user', JSON.stringify(user));
+  state.user = user;
+  mod('#onboard',false);
+  pushBubble(`Welcome, ${name}! Your interests are set. I’ll tune suggestions to ${user.interests.join(' & ')}.`);
+}
+
+$('#openLogin').onclick = ()=>mod('#login', true);
+$('#closeLogin').onclick = ()=>mod('#login', false);
+$('#doLogin').onclick = ()=>{
+  const email = $('#loginEmail').value.trim();
+  const user = JSON.parse(localStorage.getItem('hb_user')||'null');
+  mod('#login', false);
+  pushBubble(user?`Welcome back, ${user.name}!`:`Signed in as ${email||'guest@example.com'}.`);
+}
+
+// hero buttons
+$('#startNow').onclick = ()=>mod('#onboard', true);
+$('#scrollDemo').onclick = ()=>document.getElementById('demoChatCard').scrollIntoView({behavior:'smooth', block:'center'});
+
+// accessibility niceties
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){ mod('#onboard',false); mod('#login',false); }
+});
+</script>
 </body>
 </html>
