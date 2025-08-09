@@ -1,5 +1,5 @@
-// HeartBridge SW v5 — HTML network-first / assets cache-first
-const CACHE = 'heartbridge-cache-v5';
+// HeartBridge SW v6 — HTML network-first / assets cache-first
+const CACHE = 'heartbridge-cache-v6';
 const PRELOAD = [
   '/index.html',
   '/manifest.json',

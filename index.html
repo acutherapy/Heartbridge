@@ -10,7 +10,6 @@
   <meta name="theme-color" content="#0f1220">
   <style>
     body{font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial; margin:24px}
-    h1{font-size:40px;margin:0 0 18px}
     input{padding:10px;border-radius:8px;border:1px solid #ccc;margin-right:8px}
     button{padding:10px 14px;border-radius:8px;border:0;background:#6c5ce7;color:#fff}
     .row{margin:16px 0;}
@@ -34,7 +33,6 @@
   </div>
 
   <script>
-    // PWA SW
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
     }
@@ -57,18 +55,14 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const redirectHome = () => {
-      // 跳到首页并破缓存
-      location.replace('/?v=5');
-    };
+    const goHome = () => window.location.href = "/";
 
     document.getElementById('createBtn').addEventListener('click', async () => {
       const email = document.getElementById('regEmail').value.trim();
       const pw = document.getElementById('regPw').value.trim();
       try{
         await createUserWithEmailAndPassword(auth, email, pw);
-        alert('Account created!');
-        setTimeout(redirectHome, 0);
+        goHome();
       }catch(e){ alert(e.message); }
     });
 
@@ -77,16 +71,12 @@
       const pw = document.getElementById('loginPw').value.trim();
       try{
         await signInWithEmailAndPassword(auth, email, pw);
-        alert('Login successful!');
-        setTimeout(redirectHome, 0);
+        goHome();
       }catch(e){ alert(e.message); }
     });
 
-    // 兜底：已登录自动回首页
     onAuthStateChanged(auth, (user) => {
-      if (user && !location.search.includes('v=5')) {
-        redirectHome();
-      }
+      // 这里可以控制UI，比如显示用户邮箱或登出按钮
     });
   </script>
 </body>
