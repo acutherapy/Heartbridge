@@ -1,7 +1,8 @@
-// HeartBridge SW v6 — HTML network-first / assets cache-first
-const CACHE = 'heartbridge-cache-v6';
+// HeartBridge SW v7 — include app.html in preload
+const CACHE = 'heartbridge-cache-v7';
 const PRELOAD = [
   '/index.html',
+  '/app.html',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -17,7 +18,7 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))),
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
@@ -31,9 +32,10 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(req).then((res) => {
         const copy = res.clone();
-        caches.open(CACHE).then(c => c.put('/index.html', copy));
+        const key = new URL(req.url).pathname;
+        caches.open(CACHE).then(c => c.put(key, copy));
         return res;
-      }).catch(() => caches.match('/index.html'))
+      }).catch(() => caches.match('/app.html') || caches.match('/index.html'))
     );
     return;
   }

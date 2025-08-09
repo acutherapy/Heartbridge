@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HeartBridge · App</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f1220">
+  <style>
+    :root{
+      --bg:#0f1220; --card:#171a2f; --ink:#e8ebff; --muted:#9aa3c7;
+      --brand:#7c5cff; --brand2:#2ee6a6; --line:rgba(255,255,255,.1);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0; color:var(--ink);
+      font-family: ui-sans-serif,system-ui,-apple-system,Inter,Segoe UI,Roboto,Helvetica,Arial;
+      background:
+        radial-gradient(900px 600px at 5% -10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(900px 600px at 95% 110%, rgba(46,230,166,.15), transparent 60%),
+        var(--bg);
+    }
+    .nav{position:sticky;top:0;z-index:9;display:flex;justify-content:space-between;align-items:center;
+      padding:14px 18px;background:rgba(10,12,25,.6);backdrop-filter: blur(8px);border-bottom:1px solid var(--line)}
+    .logo{display:flex;gap:10px;align-items:center;font-weight:700}
+    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(45deg,var(--brand),var(--brand2))}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
+      padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn.p{background:var(--brand);border-color:transparent;color:#fff;font-weight:700}
+    .wrap{max-width:1120px;margin:0 auto;padding:16px}
+    .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+    h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:8px 0 10px}
+    .sub{color:var(--muted)}
+    .chip{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:#cfd6ff}
+    .chat{display:grid;grid-template-rows:auto 1fr auto;min-height:420px}
+    .msgs{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:8px}
+    .bubble{max-width:78%;padding:10px 12px;border-radius:12px;line-height:1.35}
+    .ai{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+    .me{align-self:flex-end;background:rgba(124,92,255,.25);border:1px solid rgba(124,92,255,.4)}
+    .composer{display:flex;gap:8px}
+    .field{flex:1;display:flex;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px}
+    .field input{flex:1;border:0;outline:none;background:transparent;color:var(--ink);padding:10px}
+    .meter{height:8px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+    .meter i{display:block;height:100%;width:16%;background:linear-gradient(90deg,#2ee6a6,#ffd166,#ff5c8a)}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .match{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .pf{background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),var(--card);
+      border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .pf-top{height:140px;background:radial-gradient(600px 200px at 50% -20%, rgba(124,92,255,.35), transparent 60%),linear-gradient(120deg,#31365e,#20233d)}
+    .pf-body{padding:12px}
+    .tag{font-size:.75rem;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:#ced5ff;display:inline-block;margin-right:6px;margin-bottom:6px}
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} .cols{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span> HeartBridge</div>
+    <div class="row">
+      <button class="btn" onclick="location.href='/'">Account</button>
+    </div>
+  </div>
+
+  <div class="wrap grid">
+    <div class="card">
+      <span class="chip">AI Talk Assistant</span>
+      <h1>Talk natural, connect real.</h1>
+      <p class="sub">Pick your tone & vibe, type a message, and I’ll suggest a respectful next line. Everyone is 18+. Consent first, always.</p>
+      <div class="card chat" style="margin-top:12px">
+        <div class="msgs" id="msgs"></div>
+        <div class="composer">
+          <div class="field"><input id="input" placeholder="Type your message... (enter to send)"></div>
+          <button class="btn p" id="send">Send</button>
+        </div>
+        <div style="margin-top:8px">
+          <div class="meter"><i id="meter"></i></div>
+          <div class="sub" style="font-size:.85rem;margin-top:6px">Safety meter auto‑flags pushy / age‑inappropriate lines.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <h3>Smart Match (Interests first)</h3>
+        <p class="sub">Pick a vibe, not an age. Everyone is 18+. We match by interests & lifestyle.</p>
+        <div class="match" id="match"></div>
+      </div>
+      <div class="card">
+        <h3>Starter Packs</h3>
+        <div id="packs"></div>
+        <div class="sub" style="margin-top:10px">
+          <strong>Consent‑first:</strong> If either person toggles <em>Not into age‑gap</em>, we won’t surface the match.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PWA SW
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+    }
+
+    const msgs = document.getElementById('msgs');
+    const push = (t,who='ai') => {
+      const b = document.createElement('div');
+      b.className = 'bubble ' + (who==='me'?'me':'ai');
+      b.textContent = t;
+      msgs.appendChild(b);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    const bad = /(youngster|underage|secret|hotel now|send pics|nsfw|nude|explicit)/ig;
+    const score = (s)=>{
+      let x=0; if(bad.test(s)) x+=60;
+      if(/drink(s)? tonight/i.test(s)) x+=15;
+      if(/come over/i.test(s)) x+=20;
+      if(/age/i.test(s) && /okay/i.test(s)) x+=10;
+      return Math.min(95,x);
+    };
+    const bar = (n)=> document.getElementById('meter').style.width = Math.max(10, 8+n*0.9)+'%';
+    const reply = (m)=>{
+      const replies = [
+        "Got it. What vibe are you hoping for—coffee chat, hobby deep‑dive, or travel stories?",
+        "That makes sense. Curious, what’s a small joy that made your week better?",
+        "Love the energy. Want a gentle icebreaker or something a bit bold?"
+      ];
+      return replies[Math.floor(Math.random()*replies.length)];
+    }
+    push("Hey! I’m HeartBridge’s AI coach. Type something—I'll offer a kind, safe next line.");
+    document.getElementById('send').onclick = ()=>{
+      const v = document.getElementById('input').value.trim(); if(!v) return;
+      push(v,'me'); document.getElementById('input').value='';
+      const s = score(v); bar(s);
+      if(s>50) push("Heads up—this could read as pushy or unsafe. Try softening or changing the topic.");
+      setTimeout(()=>push(reply(v)), 400);
+    };
+
+    const people=[
+      {n:"Mina",a:24,t:["Photography","Books","Hiking"],d:"Sunrise hikes + indie film nights."},
+      {n:"Ken",a:29,t:["Coffee","Music","Travel"],d:"Third‑wave coffee nerd, open‑mic guitar."},
+      {n:"Ivy",a:31,t:["Books","Music","Coffee"],d:"Book club host; lo‑fi at work."},
+      {n:"Jay",a:26,t:["Films","Travel","Hiking"],d:"A24 stan, cheap flights hunter."}
+    ];
+    const match = document.getElementById('match');
+    people.forEach(p=>{
+      const el = document.createElement('div'); el.className='pf';
+      el.innerHTML = '<div class="pf-top"></div><div class="pf-body"><div style="display:flex;justify-content:space-between;align-items:center"><strong>'+p.n+' · '+p.a+'</strong><button class="btn">Wave 👋</button></div><div class="sub" style="margin:6px 0">'+p.d+'</div>'+p.t.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div>';
+      match.appendChild(el);
+    });
+
+    const packs = [
+      {t:"Coffee chat", tips:["What’s your coffee ritual?","Café you’d recommend?","Weekday vs weekend coffee?" ]},
+      {t:"Travel warm‑up", tips:["What city surprised you most?","Window or aisle?","Dream short trip this month?"]},
+    ];
+    const packsEl = document.getElementById('packs');
+    packs.forEach(p=>{
+      const box = document.createElement('div'); box.style.margin='8px 0';
+      box.innerHTML = '<div><strong>'+p.t+'</strong></div><div class="sub">'+p.tips.join(" · ")+'</div><button class="btn" style="margin-top:6px">Use tips →</button>';
+      packsEl.appendChild(box);
+    });
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HeartBridge</title>
+  <title>HeartBridge · Sign in</title>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
   <link rel="manifest" href="/manifest.json">
@@ -17,14 +17,12 @@
 </head>
 <body>
   <h1>HeartBridge</h1>
-
   <h2>Create Account</h2>
   <div class="row">
     <input id="regEmail" placeholder="Email"/>
     <input id="regPw" type="password" placeholder="Password"/>
     <button id="createBtn">Create Account</button>
   </div>
-
   <h2>Login</h2>
   <div class="row">
     <input id="loginEmail" placeholder="Email"/>
@@ -37,7 +35,6 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
     }
   </script>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
@@ -51,18 +48,17 @@
       appId: "1:915430485697:web:0aaeb1b9f25fbbcb09ae40",
       measurementId: "G-BWF33RZRG5"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const goHome = () => window.location.href = "/";
+    const goApp = () => window.location.href = "/app.html";
 
     document.getElementById('createBtn').addEventListener('click', async () => {
       const email = document.getElementById('regEmail').value.trim();
       const pw = document.getElementById('regPw').value.trim();
       try{
         await createUserWithEmailAndPassword(auth, email, pw);
-        goHome();
+        goApp();
       }catch(e){ alert(e.message); }
     });
 
@@ -71,12 +67,12 @@
       const pw = document.getElementById('loginPw').value.trim();
       try{
         await signInWithEmailAndPassword(auth, email, pw);
-        goHome();
+        goApp();
       }catch(e){ alert(e.message); }
     });
 
     onAuthStateChanged(auth, (user) => {
-      // 这里可以控制UI，比如显示用户邮箱或登出按钮
+      // 可根据 user 切 UI，这里直接不处理
     });
   </script>
 </body>
