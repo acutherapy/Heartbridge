@@ -4,12 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HeartBridge</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f1220">
+  <style>
+    body{font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial; margin:24px}
+    h1{font-size:40px;margin:0 0 18px}
+    input{padding:10px;border-radius:8px;border:1px solid #ccc;margin-right:8px}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#6c5ce7;color:#fff}
+    .row{margin:16px 0;}
+  </style>
+</head>
+<body>
+  <h1>HeartBridge</h1>
+
+  <h2>Create Account</h2>
+  <div class="row">
+    <input id="regEmail" placeholder="Email"/>
+    <input id="regPw" type="password" placeholder="Password"/>
+    <button id="createBtn">Create Account</button>
+  </div>
+
+  <h2>Login</h2>
+  <div class="row">
+    <input id="loginEmail" placeholder="Email"/>
+    <input id="loginPw" type="password" placeholder="Password"/>
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <script>
+    // PWA SW
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
+    }
+  </script>
+
   <script type="module">
-    // Firebase SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDrw4ty4nFSQ6ddZbG-AUUjxAdL0E4ZQwU",
       authDomain: "heartbridge-5a9e8.firebaseapp.com",
@@ -23,33 +57,37 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.createAccount = function() {
-      const email = document.getElementById('regEmail').value;
-      const pw = document.getElementById('regPw').value;
-      createUserWithEmailAndPassword(auth, email, pw)
-        .then(() => alert('Account created!'))
-        .catch(e => alert(e.message));
-    }
+    const redirectHome = () => {
+      // 跳到首页并破缓存
+      location.replace('/?v=5');
+    };
 
-    window.loginAccount = function() {
-      const email = document.getElementById('loginEmail').value;
-      const pw = document.getElementById('loginPw').value;
-      signInWithEmailAndPassword(auth, email, pw)
-        .then(() => alert('Login successful!'))
-        .catch(e => alert(e.message));
-    }
+    document.getElementById('createBtn').addEventListener('click', async () => {
+      const email = document.getElementById('regEmail').value.trim();
+      const pw = document.getElementById('regPw').value.trim();
+      try{
+        await createUserWithEmailAndPassword(auth, email, pw);
+        alert('Account created!');
+        setTimeout(redirectHome, 0);
+      }catch(e){ alert(e.message); }
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pw = document.getElementById('loginPw').value.trim();
+      try{
+        await signInWithEmailAndPassword(auth, email, pw);
+        alert('Login successful!');
+        setTimeout(redirectHome, 0);
+      }catch(e){ alert(e.message); }
+    });
+
+    // 兜底：已登录自动回首页
+    onAuthStateChanged(auth, (user) => {
+      if (user && !location.search.includes('v=5')) {
+        redirectHome();
+      }
+    });
   </script>
-</head>
-<body>
-  <h1>HeartBridge</h1>
-  <h2>Create Account</h2>
-  <input id="regEmail" placeholder="Email" />
-  <input id="regPw" placeholder="Password" type="password" />
-  <button onclick="createAccount()">Create Account</button>
-
-  <h2>Login</h2>
-  <input id="loginEmail" placeholder="Email" />
-  <input id="loginPw" placeholder="Password" type="password" />
-  <button onclick="loginAccount()">Login</button>
 </body>
 </html>
