@@ -15,15 +15,28 @@ button{border:0;border-radius:10px;padding:12px 14px;background:var(--brand);col
 <div class="wrap"><div class="card">
   <h1>HeartBridge</h1>
   <p class="muted">Sign in to continue. Demo only — any email/password works.</p>
-  <div class="row"><input id="email" placeholder="Email"><input id="pw" type="password" placeholder="Password"></div>
-  <div class="row" style="justify-content:flex-end"><button id="login">Login</button></div>
+  <form id="loginForm" class="row">
+    <input id="email" placeholder="Email" autocomplete="username" />
+    <input id="pw" type="password" placeholder="Password" autocomplete="current-password" />
+    <button id="login" type="submit">Login</button>
+  </form>
 </div></div>
 <script>
-document.getElementById('login').onclick = ()=>{
-  const email=document.getElementById('email').value.trim();
-  if(!email) return alert('Enter email');
-  localStorage.setItem('hb_user', JSON.stringify({email, ts: Date.now()}));
-  location.href='/app.html';
-};
+  // auto-redirect if already logged in
+  if (localStorage.getItem('hb_user')) location.replace('/app.html');
+
+  // unify submit (enter + click)
+  window.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const doLogin = () => {
+      const val = (email.value||'').trim();
+      if (!val) { alert('Enter email'); return; }
+      localStorage.setItem('hb_user', JSON.stringify({ email: val, ts: Date.now() }));
+      location.assign('/app.html');
+    };
+    form?.addEventListener('submit', e => { e.preventDefault(); doLogin(); });
+    document.getElementById('login')?.addEventListener('click', e => { e.preventDefault(); doLogin(); });
+  });
 </script>
 </body></html>

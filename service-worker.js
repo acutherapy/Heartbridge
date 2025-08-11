@@ -1,4 +1,4 @@
-// v11
+// v12
 const CACHE='hb-cache-v12';
 const ASSETS=['/','/index.html','/app.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
