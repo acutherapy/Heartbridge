@@ -1,79 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HeartBridge · Sign in</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0f1220">
-  <style>
-    body{font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial; margin:24px}
-    input{padding:10px;border-radius:8px;border:1px solid #ccc;margin-right:8px}
-    button{padding:10px 14px;border-radius:8px;border:0;background:#6c5ce7;color:#fff}
-    .row{margin:16px 0;}
-  </style>
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HeartBridge · Sign in</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+:root{--bg:#0f1220;--card:#171a2f;--ink:#e8ebff;--muted:#9aa3c7;--brand:#7c5cff}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto}
+.wrap{min-height:100%;display:grid;place-items:center;padding:24px}
+.card{width:min(460px,92%);background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+h1{margin:0 0 10px;font-size:28px}.muted{color:var(--muted)}
+.row{display:flex;gap:8px;margin-top:10px}
+input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--ink)}
+button{border:0;border-radius:10px;padding:12px 14px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+</style></head><body>
+<div class="wrap"><div class="card">
   <h1>HeartBridge</h1>
-  <h2>Create Account</h2>
-  <div class="row">
-    <input id="regEmail" placeholder="Email"/>
-    <input id="regPw" type="password" placeholder="Password"/>
-    <button id="createBtn">Create Account</button>
-  </div>
-  <h2>Login</h2>
-  <div class="row">
-    <input id="loginEmail" placeholder="Email"/>
-    <input id="loginPw" type="password" placeholder="Password"/>
-    <button id="loginBtn">Login</button>
-  </div>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
-    }
-  </script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrw4ty4nFSQ6ddZbG-AUUjxAdL0E4ZQwU",
-      authDomain: "heartbridge-5a9e8.firebaseapp.com",
-      projectId: "heartbridge-5a9e8",
-      storageBucket: "heartbridge-5a9e8.firebasestorage.app",
-      messagingSenderId: "915430485697",
-      appId: "1:915430485697:web:0aaeb1b9f25fbbcb09ae40",
-      measurementId: "G-BWF33RZRG5"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const goApp = () => window.location.href = "/app.html";
-
-    document.getElementById('createBtn').addEventListener('click', async () => {
-      const email = document.getElementById('regEmail').value.trim();
-      const pw = document.getElementById('regPw').value.trim();
-      try{
-        await createUserWithEmailAndPassword(auth, email, pw);
-        goApp();
-      }catch(e){ alert(e.message); }
-    });
-
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const pw = document.getElementById('loginPw').value.trim();
-      try{
-        await signInWithEmailAndPassword(auth, email, pw);
-        goApp();
-      }catch(e){ alert(e.message); }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      // 可根据 user 切 UI，这里直接不处理
-    });
-  </script>
-</body>
-</html>
+  <p class="muted">Sign in to continue. Demo only — any email/password works.</p>
+  <div class="row"><input id="email" placeholder="Email"><input id="pw" type="password" placeholder="Password"></div>
+  <div class="row" style="justify-content:flex-end"><button id="login">Login</button></div>
+</div></div>
+<script>
+document.getElementById('login').onclick = ()=>{
+  const email=document.getElementById('email').value.trim();
+  if(!email) return alert('Enter email');
+  localStorage.setItem('hb_user', JSON.stringify({email, ts: Date.now()}));
+  location.href='/app.html';
+};
+</script>
+</body></html>
