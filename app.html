@@ -16,19 +16,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HeartBridge · Cross‑Gen Social & Talk Assistant</title>
   <style>
-    :root{
-      --bg:#0f1220; --card:#171a2f; --ink:#e8ebff; --muted:#9aa3c7;
-      --brand:#7c5cff; --brand-2:#2ee6a6; --danger:#ff5c8a; --ok:#2ee6a6; --warn:#ffd166;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;color:var(--ink);
-      background:
-        radial-gradient(900px 600px at 5% -10%, rgba(124,92,255,.25), transparent 60%),
-        radial-gradient(900px 600px at 95% 110%, rgba(46,230,166,.15), transparent 60%),
-        var(--bg);
-    }
+    :root{--bg:#0f1220;--card:#171a2f;--ink:#e8ebff;--muted:#9aa3c7;--brand:#7c5cff;--brand-2:#2ee6a6;--danger:#ff5c8a;--ok:#2ee6a6;--warn:#ffd166}
+    *{box-sizing:border-box}html,body{height:100%}
+    body{margin:0;font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;color:var(--ink);
+      background:radial-gradient(900px 600px at 5% -10%, rgba(124,92,255,.25), transparent 60%),
+                 radial-gradient(900px 600px at 95% 110%, rgba(46,230,166,.15), transparent 60%),var(--bg)}
     a{color:var(--brand)}
     .nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
       padding:14px 20px;background:rgba(10,12,25,.7);backdrop-filter: blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
@@ -55,12 +47,18 @@
     .dot{width:10px;height:10px;border-radius:99px;background:var(--brand-2);margin-top:8px}
     .muted{color:var(--muted)}
     .footer{padding:30px 20px;color:#b8c0e6;text-align:center;border-top:1px solid rgba(255,255,255,.06)}
+
+    /* profiles */
     .match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-    .profile{background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden}
-    .pf-img{height:160px;background:radial-gradient(600px 200px at 50% -20%, rgba(124,92,255,.35), transparent 60%),linear-gradient(120deg,#31365e,#20233d)}
-    .pf-body{padding:12px}
+    .profile{background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%),var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    .pf-img{height:160px;background:#222 center/cover no-repeat}
+    .pf-body{padding:12px;display:flex;flex-direction:column;gap:8px}
     .tags{display:flex;gap:8px;flex-wrap:wrap}
     .tag{font-size:.75rem;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.16);color:#ced5ff}
+    .actions{display:flex;gap:8px;margin-top:auto}
+    .actions .btn{flex:1}
+
+    /* chat */
     .chat{display:grid;grid-template-rows:auto 1fr auto;min-height:420px}
     .messages{display:flex;flex-direction:column;gap:8px;overflow:auto;padding:8px}
     .bubble{max-width:80%;padding:10px 12px;border-radius:12px;line-height:1.35}
@@ -70,11 +68,11 @@
     .field{flex:1;display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:6px}
     .field input{flex:1;background:transparent;border:0;outline:none;color:var(--ink);padding:8px}
     .select{display:flex;gap:8px;flex-wrap:wrap}
-    .select select,.select input[type="range"]{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--ink);border-radius:8px;padding:8px}
+    .select select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--ink);border-radius:8px;padding:8px}
     .meter{height:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
     .meter > i{display:block;height:100%;width:22%;background:linear-gradient(90deg,var(--ok),var(--warn),var(--danger))}
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
-    .modal{width:min(560px,92%);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px}
+    .modal{width:min(620px,92%);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px}
     .modal h3{margin:6px 0 12px}
     .row-split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .check{display:flex;gap:8px;align-items:flex-start}
@@ -153,14 +151,6 @@
     </div>
   </header>
 
-  <section class="section">
-    <div class="kpis">
-      <div class="kpi"><div class="big" id="k1">0</div><div class="muted">Respect‑checked prompts</div></div>
-      <div class="kpi"><div class="big" id="k2">0</div><div class="muted">Conversation starters</div></div>
-      <div class="kpi"><div class="big" id="k3">0</div><div class="muted">Community interests</div></div>
-    </div>
-  </section>
-
   <section class="section cols">
     <div class="card">
       <h3>Smart Match (Interests first)</h3>
@@ -181,7 +171,30 @@
 
   <footer class="footer">© 2025 HeartBridge — Cross‑generation respect, real connections.</footer>
 
-  <!-- Onboarding modal -->
+  <!-- Profile modal -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal">
+      <h3 id="pmName">Profile</h3>
+      <div class="row-split">
+        <div><img id="pmImg" alt="" style="width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.12)"/></div>
+        <div>
+          <div class="muted" id="pmMeta"></div>
+          <div style="margin:8px 0" id="pmTags"></div>
+          <p id="pmNote"></p>
+          <div class="actions">
+            <button class="btn" id="pmWave">👋 Wave</button>
+            <button class="btn ghost" id="pmLike">♥ Like</button>
+            <button class="btn" id="pmMsg">✉ Message</button>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;justify-content:flex-end">
+        <button class="btn ghost" id="pmClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboard modal -->
   <div class="modal-backdrop" id="onboard">
     <div class="modal">
       <h3>Create your account</h3>
@@ -193,28 +206,15 @@
           <input id="age" class="field" placeholder="18+" />
           <label style="margin-top:8px">Top interests</label>
           <div class="select">
-            <select id="interestA">
-              <option>Travel</option><option>Coffee</option><option>Yoga</option><option>Cooking</option><option>Photography</option>
-            </select>
-            <select id="interestB">
-              <option>Books</option><option>Hiking</option><option>Music</option><option>Films</option><option>Art</option>
-            </select>
+            <select id="interestA"><option>Travel</option><option>Coffee</option><option>Yoga</option><option>Cooking</option><option>Photography</option></select>
+            <select id="interestB"><option>Books</option><option>Hiking</option><option>Music</option><option>Films</option><option>Art</option></select>
           </div>
         </div>
         <div class="card">
           <h4>Community rules</h4>
-          <div class="check">
-            <input type="checkbox" id="c1">
-            <label for="c1">I confirm I am 18+ and will not harass, pressure, or lie about my age or intent.</label>
-          </div>
-          <div class="check">
-            <input type="checkbox" id="c2">
-            <label for="c2">I respect consent, boundaries, and will keep conversations legal and kind.</label>
-          </div>
-          <div class="check">
-            <input type="checkbox" id="c3">
-            <label for="c3">I understand unsafe messages may be flagged or my account paused.</label>
-          </div>
+          <div class="check"><input type="checkbox" id="c1"><label for="c1">I confirm I am 18+ and will not harass, pressure, or lie about my age or intent.</label></div>
+          <div class="check"><input type="checkbox" id="c2"><label for="c2">I respect consent, boundaries, and will keep conversations legal and kind.</label></div>
+          <div class="check"><input type="checkbox" id="c3"><label for="c3">I understand unsafe messages may be flagged or my account paused.</label></div>
         </div>
       </div>
       <div class="row" style="margin-top:10px;justify-content:flex-end">
@@ -224,7 +224,7 @@
     </div>
   </div>
 
-  <!-- Login modal (mock) -->
+  <!-- Login modal -->
   <div class="modal-backdrop" id="login">
     <div class="modal">
       <h3>Sign in</h3>
@@ -248,14 +248,15 @@
   </div>
 
 <script>
-// Loader
 function hideLoader(){document.getElementById('loading')?.remove();}
 if('serviceWorker'in navigator){navigator.serviceWorker.ready.then(hideLoader).catch(hideLoader);setTimeout(hideLoader,2000);}else{hideLoader();}
 
-// Tiny state
 const $ = s=>document.querySelector(s);
+
+const actionsKey = 'hb_actions';
+const actions = JSON.parse(localStorage.getItem(actionsKey) || '{}'); // {name:{liked:true,waved:true}}
+
 const state = {
-  counters:{prompts:142, starters:580, interests:36},
   packs:[
     {title:"Coffee chat", tips:["What’s your go‑to brew?","Café you’d recommend?","Weekday vs weekend coffee rituals?"], vibe:"coffee"},
     {title:"Travel warm‑up", tips:["What city surprised you most?","Window or aisle?","Dream short trip this month?"], vibe:"travel"},
@@ -263,32 +264,37 @@ const state = {
     {title:"Hobby flex", tips:["What are you learning lately?","Show me your setup?","Beginner tips you wish you knew?"], vibe:"hobby"},
   ],
   profiles:[
-    {name:"Mina", age:24, interests:["Photography","Books","Hiking"], note:"Loves sunrise hikes + indie film nights."},
-    {name:"Ken", age:29, interests:["Coffee","Music","Travel"], note:"Third‑wave coffee nerd, open‑mic guitar."},
-    {name:"Lily", age:22, interests:["Art","Yoga","Cooking"], note:"Ceramics, farmers market weekends."},
-    {name:"Jay",  age:26, interests:["Films","Travel","Hiking"], note:"A24 stan, cheap flights hunter."},
-    {name:"Ivy",  age:31, interests:["Books","Music","Coffee"], note:"Book club host; lo‑fi at work."},
-    {name:"Noah", age:23, interests:["Photography","Art","Travel"], note:"Street shots, city wanderer."},
+    {name:"Mina", age:24, interests:["Photography","Books","Hiking"], note:"Loves sunrise hikes + indie film nights.", img:"/images/mina.svg"},
+    {name:"Ken", age:29, interests:["Coffee","Music","Travel"], note:"Third‑wave coffee nerd, open‑mic guitar.", img:"/images/ken.svg"},
+    {name:"Lily", age:22, interests:["Art","Yoga","Cooking"], note:"Ceramics, farmers market weekends.", img:"/images/lily.svg"},
+    {name:"Jay",  age:26, interests:["Films","Travel","Hiking"], note:"A24 stan, cheap flights hunter.", img:"/images/jay.svg"},
+    {name:"Ivy",  age:31, interests:["Books","Music","Coffee"], note:"Book club host; lo‑fi at work.", img:"/images/ivy.svg"},
+    {name:"Noah", age:23, interests:["Photography","Art","Travel"], note:"Street shots, city wanderer.", img:"/images/noah.svg"},
   ]
 };
 
-['k1','k2','k3'].forEach((id,i)=>{
-  const keys=['prompts','starters','interests']; const val = state.counters[keys[i]];
-  let n=0; const t=setInterval(()=>{ n += Math.ceil(val/18); if(n>=val){n=val;clearInterval(t)} document.getElementById(id).innerText=n.toLocaleString(); },25);
-});
+function saveActions(){ localStorage.setItem(actionsKey, JSON.stringify(actions)); }
 
 function renderMatches(){
-  const el = document.getElementById('matchGrid'); el.innerHTML='';
+  const el = $('#matchGrid'); el.innerHTML='';
   state.profiles.forEach(p=>{
-    const box = document.createElement('div'); box.className='profile';
-    box.innerHTML = `<div class="pf-img"></div>
+    const a = actions[p.name] || {};
+    const box = document.createElement('div');
+    box.className='profile';
+    box.innerHTML = `
+      <div class="pf-img" style="background-image:url('${p.img}'), radial-gradient(600px 200px at 50% -20%, rgba(124,92,255,.35), transparent 60%),linear-gradient(120deg,#31365e,#20233d)"></div>
       <div class="pf-body">
         <div class="row" style="justify-content:space-between;align-items:center">
-          <strong>${p.name} · ${p.age}</strong>
-          <button class="btn small ghost" data-name="${p.name}">Wave 👋</button>
+          <strong style="cursor:pointer" data-open="${p.name}">${p.name} · ${p.age}</strong>
+          <span class="muted">${p.interests[0]} • ${p.interests[1]}</span>
         </div>
-        <div class="muted" style="margin:6px 0">${p.note}</div>
+        <div class="muted" style="margin:-2px 0 4px">${p.note}</div>
         <div class="tags">${p.interests.map(i=>`<span class="tag">${i}</span>`).join('')}</div>
+        <div class="actions">
+          <button class="btn small" data-wave="${p.name}">👋 ${a.waved?'Waved':'Wave'}</button>
+          <button class="btn small ghost" data-like="${p.name}" aria-pressed="${a.liked? 'true':'false'}">♥ ${a.liked?'Liked':'Like'}</button>
+          <button class="btn small" data-msg="${p.name}">✉ Message</button>
+        </div>
       </div>`;
     el.appendChild(box);
   });
@@ -297,7 +303,9 @@ renderMatches();
 
 function renderPacks(){
   const el = document.getElementById('packs'); el.innerHTML='';
-  state.packs.forEach(p=>{
+  [
+    ...state.packs
+  ].forEach(p=>{
     const item = document.createElement('div'); item.className='item';
     item.innerHTML = `<div class="dot"></div>
       <div><div><strong>${p.title}</strong> <span class="pill">${p.vibe}</span></div>
@@ -308,7 +316,60 @@ function renderPacks(){
 }
 renderPacks();
 
-// Chat helpers
+// Profile modal
+const pm = $('#profileModal');
+const pmImg = $('#pmImg'); const pmName = $('#pmName'); const pmMeta = $('#pmMeta'); const pmTags = $('#pmTags'); const pmNote = $('#pmNote');
+function openProfile(name){
+  const p = state.profiles.find(x=>x.name===name); if(!p) return;
+  pmName.textContent = p.name;
+  pmImg.src = p.img; pmImg.alt = p.name;
+  pmMeta.textContent = `${p.age} • ${p.interests.join(' · ')}`;
+  pmTags.innerHTML = p.interests.map(i=>`<span class="tag">${i}</span>`).join(' ');
+  pmNote.textContent = p.note;
+  pm.style.display = 'flex';
+  pm.dataset.name = name;
+}
+function closeProfile(){ pm.style.display='none'; }
+document.body.addEventListener('click', e=>{
+  const s = e.target.getAttribute('data-open'); if(s) openProfile(s);
+  if(e.target.id==='pmClose') closeProfile();
+});
+
+// Actions
+document.body.addEventListener('click', e=>{
+  const wave = e.target.closest('button[data-wave]');
+  if(wave){
+    const name = wave.getAttribute('data-wave');
+    actions[name] = actions[name] || {};
+    if(!actions[name].waved){ actions[name].waved = true; saveActions(); wave.textContent = '👋 Waved'; }
+    return;
+  }
+  const like = e.target.closest('button[data-like]');
+  if(like){
+    const name = like.getAttribute('data-like');
+    actions[name] = actions[name] || {};
+    actions[name].liked = !actions[name].liked; saveActions();
+    like.setAttribute('aria-pressed', actions[name].liked ? 'true':'false');
+    like.textContent = actions[name].liked ? '♥ Liked' : '♥ Like';
+    return;
+  }
+  const msg = e.target.closest('button[data-msg]');
+  if(msg){
+    const name = msg.getAttribute('data-msg');
+    // prefill chat
+    pushBubble(`(to ${name})`, 'ai');
+    return;
+  }
+});
+
+// packs → composer
+document.getElementById('packs').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-pack]'); if(!b) return;
+  const vibe = b.getAttribute('data-pack'); document.getElementById('vibe').value = vibe;
+  pushBubble(`Loaded ${vibe} starter pack. Ask away!`);
+});
+
+// Chat demo + GPT
 const msgs = document.getElementById('msgs');
 function pushBubble(text, who='ai'){
   const b = document.createElement('div');
@@ -330,8 +391,6 @@ function meterSet(score){
   const w = Math.max(8, 8 + score*0.9);
   document.getElementById('meterBar').style.width = w + '%';
 }
-
-// ChatGPT proxy
 async function askGPT(userText){
   const system = "You are HeartBridge’s tone-safe opener coach for adults 18+. Keep replies short, kind, enthusiastic, and age-appropriate. Avoid explicit content, pressure, or harassment.";
   const res = await fetch('/api/chat', {
@@ -345,7 +404,6 @@ async function askGPT(userText){
   if (!res.ok) throw new Error(data.error || 'API error');
   return data.text;
 }
-
 let sending=false;
 async function doSend(){
   if (sending) return;
@@ -363,12 +421,6 @@ async function doSend(){
 document.getElementById('send').addEventListener('click', e=>{e.preventDefault(); doSend();});
 document.getElementById('input').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); doSend(); } });
 
-document.getElementById('packs').addEventListener('click', e=>{
-  const b = e.target.closest('button[data-pack]'); if(!b) return;
-  const vibe = b.getAttribute('data-pack'); document.getElementById('vibe').value = vibe;
-  pushBubble(`Loaded ${vibe} starter pack. Ask away!`);
-});
-
 // Onboarding & login (mock)
 const mod = (id,show)=>{ const el=document.querySelector(id); el.style.display = show?'flex':'none'; }
 document.getElementById('openOnboard').onclick = ()=>mod('#onboard',true);
@@ -379,7 +431,7 @@ document.getElementById('doLogin').onclick = ()=>{ const email=document.getEleme
 document.getElementById('startNow').onclick = ()=>mod('#onboard', true);
 document.getElementById('scrollDemo').onclick = ()=>document.getElementById('demoChatCard').scrollIntoView({behavior:'smooth', block:'center'});
 
-// Seed messages
+// Seed
 pushBubble("Hey! I’m HeartBridge’s AI talk coach. Pick your tone & vibe, type something, and I’ll suggest a respectful next line.");
 pushBubble("Reminder: Everyone here is 18+. Consent and kindness are non‑negotiable.");
 </script>

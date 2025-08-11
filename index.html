@@ -6,7 +6,7 @@
 :root{--bg:#0f1220;--card:#171a2f;--ink:#e8ebff;--muted:#9aa3c7;--brand:#7c5cff}
 *{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto}
 .wrap{min-height:100%;display:grid;place-items:center;padding:24px}
-.card{width:min(460px,92%);background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.card{width:min(480px,92%);background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 h1{margin:0 0 10px;font-size:28px}.muted{color:var(--muted)}
 .row{display:flex;gap:8px;margin-top:10px}
 input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--ink)}
@@ -22,10 +22,7 @@ button{border:0;border-radius:10px;padding:12px 14px;background:var(--brand);col
   </form>
 </div></div>
 <script>
-  // auto-redirect if already logged in
   if (localStorage.getItem('hb_user')) location.replace('/app.html');
-
-  // unify submit (enter + click)
   window.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');
     const email = document.getElementById('email');
